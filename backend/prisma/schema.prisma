@@ -1,0 +1,88 @@
+// File: prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+enum Role {
+  admin
+  owner
+  user
+}
+
+enum PropertyStatus {
+  draft
+  published
+  archived
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role          @default(user)
+  resetPasswordToken      String?   @unique
+  resetPasswordExpires    DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  properties Property[] 
+  favorites  Favorite[] 
+  contacts   Contact[]  
+
+  @@map("users")
+}
+
+model Property {
+  id          String         @id @default(uuid())
+  ownerId     String        
+  title       String
+  description String         @db.Text
+  location    String
+  price       Float
+  images      String[]      
+  status      PropertyStatus @default(draft)
+  deletedAt   DateTime?      
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  favorites Favorite[]
+  contacts  Contact[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("properties")
+}
+
+model Favorite {
+  id         String   @id @default(uuid())
+  userId     String   
+  propertyId String   
+  createdAt  DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@map("favorites")
+}
+
+model Contact {
+  id         String   @id @default(uuid())
+  propertyId String   
+  userId     String   
+  message    String   @db.Text
+  phone      String
+  createdAt  DateTime @default(now())
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([userId])
+  @@map("contacts")
+}
