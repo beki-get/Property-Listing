@@ -8,6 +8,7 @@ import propertyRouter from './routes/propertyRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import favoriteRouter from './routes/favoriteRoutes.js';
 import inquiryRouter from './routes/contactInquiryRoutes.js';
+import userRouter from './routes/userRoutes.js';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const envFile = nodeEnv === 'production' ? '.env.production' : '.env.development';
@@ -36,11 +37,16 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: nodeEnv });
 });
 
+app.get('/', (req, res) => {
+  res.send('Property Management API is running. Please refer to the documentation for available endpoints.');
+});
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/properties', propertyRouter);
 app.use('/api/favorites', favoriteRouter);
 app.use('/api/inquiries', inquiryRouter);
+app.use('/api/users', userRouter);
 
 
 app.use( (req, res) => {
