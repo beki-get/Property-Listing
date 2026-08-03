@@ -98,3 +98,25 @@ export const fetchMySentInquiries = async (buyerId) => {
 
   return inquiries;
 };
+
+
+export const fetchOwnerReceivedInquiries = async (ownerId) => {
+  const inquiries = await prisma.contact.findMany({
+    where: {
+      property: {
+        ownerId: ownerId, 
+      },
+    },
+    include: {
+      property: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return inquiries;
+};

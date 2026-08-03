@@ -14,12 +14,19 @@ inquiryRouter.use(protect);
 
 inquiryRouter.post(
   '/:propertyId',
+  restrictTo('user'),
   validateRequest(createInquirySchema),
   inquiryController.handleCreateInquiry
 );
 
+//buyer
 inquiryRouter.get('/my-inquiries', 
+  restrictTo('user'),
   inquiryController.handleGetMySentInquiries);
+
+//owner
+inquiryRouter.get('/received', 
+   inquiryController.getMyReceivedInquiries);
 
 inquiryRouter.get(
   '/property/:propertyId',

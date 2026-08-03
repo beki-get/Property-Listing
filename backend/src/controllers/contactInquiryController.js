@@ -57,3 +57,18 @@ export const handleGetMySentInquiries = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getMyReceivedInquiries = async (req, res, next) => {
+  try {
+    const inquiries = await contactInquiryService.fetchOwnerReceivedInquiries(req.user.id);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        inquiries,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
