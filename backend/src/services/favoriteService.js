@@ -14,6 +14,10 @@ export const addPropertyToFavorites = async (userId, propertyId) => {
   if (!property) {
     throw new AppError('Property not found or is no longer available', 404);
   }
+ 
+  if (property.ownerId === userId) {
+  throw new AppError("You cannot favorite your own property", 400);
+}
 
   const existingFavorite = await prisma.favorite.findUnique({
     where: {

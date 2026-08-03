@@ -33,38 +33,53 @@ export const fetchPublishedProperties = async (queryParams) => {
   const limitNumber = Math.max(1, Math.min(100, parseInt(queryParams.limit, 10) || 10));
   const skipCount = (pageNumber - 1) * limitNumber;
 
-  const filterConditions = {
-    deletedAt: null,       
-    status: 'published', 
-  };
+  // Build array of AND conditions
+  const andConditions = [
+    { deletedAt: null },       
+    { status: 'published' },
+  ];
 
-  if (queryParams.location) {
-    filterConditions.location = {
-      contains: queryParams.location,
-      mode: 'insensitive',
-    };
+  // 1. Unified Main Search (Checks Title, Description AND Location)
+  if (queryParams.search && queryParams.search.trim() !== '') {
+    const searchTerm = queryParams.search.trim();
+    andConditions.push({
+      OR: [
+        { title: { contains: searchTerm, mode: 'insensitive' } },
+        { description: { contains: searchTerm, mode: 'insensitive' } },
+        { location: { contains: searchTerm, mode: 'insensitive' } }, // FIXED: Location added here!
+      ],
+    });
   }
 
-  if (queryParams.search) {
-    filterConditions.OR = [
-      { title: { contains: queryParams.search, mode: 'insensitive' } },
-      { description: { contains: queryParams.search, mode: 'insensitive' } },
-    ];
+  // 2. Separate Location Filter (Only used if explicitly provided without main search)
+  if (queryParams.location && queryParams.location.trim() !== '' && !queryParams.search) {
+    andConditions.push({
+      location: {
+        contains: queryParams.location.trim(),
+        mode: 'insensitive',
+      },
+    });
   }
 
+  // 3. Price Filter
   if (queryParams.minPrice || queryParams.maxPrice) {
-      const min = parseFloat(queryParams.minPrice);
-      const max = parseFloat(queryParams.maxPrice);
+    const min = parseFloat(queryParams.minPrice);
+    const max = parseFloat(queryParams.maxPrice);
 
-    filterConditions.price = {
-    ...(Boolean(!isNaN(min)) && { gte: min }),
-    ...(Boolean(!isNaN(max)) && { lte: max }),
-    };
-   }
+    const priceFilter = {};
+    if (!isNaN(min)) priceFilter.gte = min;
+    if (!isNaN(max)) priceFilter.lte = max;
+
+    if (Object.keys(priceFilter).length > 0) {
+      andConditions.push({ price: priceFilter });
+    }
+  }
+
+  const where = { AND: andConditions };
 
   const [propertiesList, totalCount] = await Promise.all([
     prisma.property.findMany({
-      where: filterConditions,
+      where,
       skip: skipCount,
       take: limitNumber,
       orderBy: { createdAt: 'desc' },
@@ -79,7 +94,7 @@ export const fetchPublishedProperties = async (queryParams) => {
         owner: { select: { id: true, email: true } },
       },
     }),
-    prisma.property.count({ where: filterConditions }),
+    prisma.property.count({ where }),
   ]);
 
   return {
@@ -92,6 +107,7 @@ export const fetchPublishedProperties = async (queryParams) => {
     },
   };
 };
+
 
 export const fetchPropertyById = async (propertyId) => {
   const propertyRecord = await prisma.property.findFirst({

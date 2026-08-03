@@ -19,8 +19,13 @@ propertyRouter.get(
   propertyController.handleGetAllProperties
 );
 
-propertyRouter.get('/:id', propertyController.handleGetPropertyById);
 
+propertyRouter.get(
+  '/my-properties',
+  protect,
+  restrictTo('owner'),
+  propertyController.handleGetMyProperties
+);
 
 // OWNER-ONLY ROUTES 
 
@@ -33,13 +38,10 @@ propertyRouter.post(
   propertyController.handleCreateProperty
 );
 
+propertyRouter.get('/:id', propertyController.handleGetPropertyById);
+
 //Get all properties owned by logged-in owner
-propertyRouter.get(
-  '/my-properties',
-  protect,
-  restrictTo('owner'),
-  propertyController.handleGetMyProperties
-);
+
 
 // Edit draft 
 propertyRouter.patch(
