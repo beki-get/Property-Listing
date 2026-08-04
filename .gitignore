@@ -1,3 +1,9 @@
+# Ignore ALL environment files
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
 
 # Logs
 logs/
@@ -13,9 +19,3 @@ node_modules/
 dist/
 build/
 
-# Ignore ALL environment files
-.env
-.env.local
-.env.development
-.env.production
-.env*.local

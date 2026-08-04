@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Heart, MessageSquare, Plus, Eye, Send } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
@@ -13,7 +13,7 @@ import OwnerInquiries from './OwnerInquiries';
 import UserSaved from './UserSaved';
 import UserInquiries from './UserInquiries';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab');
@@ -212,5 +212,13 @@ export default function DashboardPage() {
 
       {tab === 'inquiries' && isUser() && <UserInquiries inquiries={inquiries} loading={inqLoading} />}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<LoadingPage />}>
+      <DashboardContent />
+    </Suspense>
   );
 }
