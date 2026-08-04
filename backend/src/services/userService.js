@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { AppError } from '../errors/AppError.js';
+import { AppError } from '../error/AppError.js';
 
 export const getAllUsers = async () => {
   return await prisma.user.findMany({
