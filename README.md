@@ -4,7 +4,7 @@
 A full-stack property listing platform built for property management. Buyers can browse, save, and inquire about properties. Owners can list and manage properties. Admins moderate the platform.
 
 ## Live URLs
-- Frontend: 
+- Frontend: https://property-listing-frontend-git-main-berekets-projects-3abd8483.vercel.app
 - Backend API: https://property-listing-32ih.onrender.com/api
 
 ## Project Structure
