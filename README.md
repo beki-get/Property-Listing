@@ -71,6 +71,8 @@ Next.js supports both server-side rendering and client-side rendering in the sam
 
 Zustand is minimal — no boilerplate, no context providers, no reducers. It handles two specific needs: persisting authentication across page refreshes and syncing favorites across browser tabs via BroadcastChannel.
 
+Property images are stored as URLs in PostgreSQL rather than binary data in the database. Cloudinary handles image hosting, CDN delivery, and optimization separately from the application. Storing images directly in the database would increase storage costs, slow down queries, and make backups unnecessarily large. Cloudinary gives a dedicated URL per image that can be stored as a simple string — keeping the database lean and the API responses fast
+
 ## Features
 
 **Buyers**
