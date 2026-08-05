@@ -39,7 +39,7 @@ export default function PropertiesClient({ initialData }) {
       // so backend finds matches in title, description AND location
       const params = {
         page: p,
-        limit: 9,
+        limit: 6,
         ...(search && { search }),
         ...(search && { location: search }),
         ...(f.minPrice && { minPrice: f.minPrice }),
