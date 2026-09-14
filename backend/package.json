@@ -16,8 +16,8 @@
     "zod": "^4.4.3"
   },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "start": "node init && node src/server.js",
+    "dev": "node init && node --watch src/server.js"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",
