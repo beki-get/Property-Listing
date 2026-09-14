@@ -1,23 +1,22 @@
-
-import prisma from '../config/db.js';
-import { AppError } from '../error/AppError.js';
+import prisma from "../config/db.js";
+import { AppError } from "../error/AppError.js";
 
 export const addPropertyToFavorites = async (userId, propertyId) => {
   const property = await prisma.property.findFirst({
     where: {
       id: propertyId,
-      status: 'published',
+      status: "published",
       deletedAt: null,
     },
   });
 
   if (!property) {
-    throw new AppError('Property not found or is no longer available', 404);
+    throw new AppError("Property not found or is no longer available", 404);
   }
- 
+
   if (property.ownerId === userId) {
-  throw new AppError("You cannot favorite your own property", 400);
-}
+    throw new AppError("You cannot favorite your own property", 400);
+  }
 
   const existingFavorite = await prisma.favorite.findUnique({
     where: {
@@ -29,7 +28,7 @@ export const addPropertyToFavorites = async (userId, propertyId) => {
   });
 
   if (existingFavorite) {
-    throw new AppError('Property is already in your favorites', 400);
+    throw new AppError("Property is already in your favorites", 400);
   }
 
   const favorite = await prisma.favorite.create({
@@ -64,7 +63,7 @@ export const removePropertyFromFavorites = async (userId, propertyId) => {
   });
 
   if (!existingFavorite) {
-    throw new AppError('Property is not in your favorites list', 404);
+    throw new AppError("Property is not in your favorites list", 404);
   }
 
   await prisma.favorite.delete({
@@ -76,13 +75,13 @@ export const removePropertyFromFavorites = async (userId, propertyId) => {
     },
   });
 
-  return { message: 'Property removed from favorites successfully' };
+  return { message: "Property removed from favorites successfully" };
 };
 
 export const getUserFavoriteProperties = async (userId) => {
   const favorites = await prisma.favorite.findMany({
     where: { userId },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     select: {
       id: true,
       createdAt: true,
@@ -104,7 +103,7 @@ export const getUserFavoriteProperties = async (userId) => {
   });
 
   const activeFavorites = favorites.filter(
-    (favorite) => favorite.property && favorite.property.status === 'published'
+    (favorite) => favorite.property && favorite.property.status === "published",
   );
 
   return activeFavorites;
